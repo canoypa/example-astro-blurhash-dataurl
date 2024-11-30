@@ -1,0 +1,68 @@
+---
+import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
+import { Blurhash } from "react-blurhash";
+import esmImageBuffer from "../content/example.jpg?arraybuffer";
+import { getImageBuffer } from "../core/image";
+import {
+  blurhashToDataUrl,
+  imageToBlurhash,
+  imageToDataUrl,
+} from "../core/placeholder";
+
+const entry = await getEntry("post", "example");
+const esmImageBlurhash = await imageToBlurhash(esmImageBuffer);
+const esmImageBlurhashDataUrl = await blurhashToDataUrl(esmImageBlurhash);
+
+const mdImageBuffer = await getImageBuffer(entry.data.image);
+const mdImageBlurhash = await imageToBlurhash(mdImageBuffer);
+const mdImageBlurhashDataUrl = await blurhashToDataUrl(mdImageBlurhash);
+
+const blurImage = await imageToDataUrl(esmImageBuffer);
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+  </head>
+  <body>
+    <section>
+      <h3>&lt;Image&gt;</h3>
+      <Image src="/example.jpg" width="100" height="100" alt="" />
+    </section>
+
+    <section>
+      <h3>react-blurhash</h3>
+      <Blurhash hash={esmImageBlurhash} width={100} height={100} client:load />
+    </section>
+
+    <section>
+      <h3>DataUrl</h3>
+      <div>
+        <p>import した画像から生成</p>
+        <div
+          style={`display: inline-block;width: 100px;height:100px;background-image: url(${esmImageBlurhashDataUrl});background-size: cover;`}
+        >
+        </div>
+      </div>
+      <div>
+        <p>frontmatter に設定した画像から生成</p>
+        <div
+          style={`display: inline-block;width: 100px;height:100px;background-image: url(${mdImageBlurhashDataUrl});background-size: cover;`}
+        >
+        </div>
+      </div>
+      <div>
+        <p>画像から直接 dataUrl に変換</p>
+        <div
+          style={`display: inline-block;width: 100px;height:100px;background-image: url(${blurImage});background-size: cover;`}
+        >
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
